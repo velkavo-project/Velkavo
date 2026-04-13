@@ -1,0 +1,15 @@
+[submodule "external/miniupnp"]
+	path = external/miniupnp
+	url = https://github.com/miniupnp/miniupnp.git
+[submodule "external/randomx"]
+	path = external/randomx
+	url = https://github.com/tevador/RandomX.git
+[submodule "external/rapidjson"]
+	path = external/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "external/supercop"]
+	path = external/supercop
+	url = https://github.com/monero-project/supercop.git
+[submodule "external/gtest"]
+	path = external/gtest
+	url = https://github.com/google/googletest.git
