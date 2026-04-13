@@ -1,0 +1,9 @@
+MAINNET:
+  Output private key: c8438bad0ea8ac12fdea025d421d033af0beab2c78d229f62920e7c13d60d0f2
+  TX private key: 5763868ef3fc42a27e4a96bc5072d04d0db9033d824a2f41de54dabc919971b3
+TESTNET:
+  Output private key: c5acf9c36be3c8d8be41577ed59e20ff2be2a4ac48a92369eb78df63eb425f0a
+  TX private key: 1c7d090ca0e1a6c35c9c84ad0785a575c70665d3387004ec79cc97e22eb102b4
+STAGENET:
+  Output private key: c65c72ce496930379030d02eb82175b8a06401b49e29bb5a8744565674e86ff5
+  TX private key: aa061299c4b265b324ff796b26df9b8bc9aba89306bca58a8e212ffebff9b718
