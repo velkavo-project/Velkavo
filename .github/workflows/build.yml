@@ -1,0 +1,103 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  build-linux-x86_64:
+    name: Linux x86_64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config \
+            libboost-all-dev libssl-dev libzmq3-dev libunbound-dev \
+            libsodium-dev libhidapi-dev liblzma-dev libreadline-dev
+
+      - name: Configure
+        run: |
+          mkdir -p build/release && cd build/release
+          cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..
+
+      - name: Build
+        run: make -C build/release daemon -j$(nproc)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: velkarod-linux-x86_64
+          path: build/release/bin/velkarod
+
+  build-linux-arm64:
+    name: Linux ARM64 (Raspberry Pi)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install cross-compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+            cmake pkg-config
+
+      - name: Install ARM64 dependencies via apt
+        run: |
+          sudo dpkg --add-architecture arm64
+          sudo sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install -y \
+            libboost-all-dev:arm64 libssl-dev:arm64 libzmq3-dev:arm64 \
+            libunbound-dev:arm64 libsodium-dev:arm64 libhidapi-dev:arm64 \
+            liblzma-dev:arm64 libreadline-dev:arm64
+
+      - name: Configure
+        run: |
+          mkdir -p build/arm64 && cd build/arm64
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DMANUAL_SUBMODULES=1 \
+                -DCMAKE_SYSTEM_NAME=Linux \
+                -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+                -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+                -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+                ../..
+
+      - name: Build
+        run: make -C build/arm64 daemon -j$(nproc)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: velkarod-linux-arm64
+          path: build/arm64/bin/velkarod
+
+  release:
+    name: Attach binaries to release
+    needs: [build-linux-x86_64, build-linux-arm64]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: Rename binaries
+        run: |
+          mv velkarod-linux-x86_64/velkarod velkarod-linux-x86_64
+          mv velkarod-linux-arm64/velkarod velkarod-linux-arm64
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            velkarod-linux-x86_64
+            velkarod-linux-arm64
