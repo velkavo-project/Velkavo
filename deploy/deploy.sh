@@ -12,7 +12,7 @@ fi
 
 # Write a key (content or path) to a temp file; echo the temp path
 resolve_key() {
-  local key_val="$1"
+  local key_val="${1/#\~/$HOME}"   # expand leading ~
   if [ -f "$key_val" ]; then
     echo "$key_val"   # already a file path
   else
@@ -27,12 +27,9 @@ resolve_key() {
 deploy_to() {
   local vm_ip="$1"
   local key_val="$2"
-  local tmp_key=""
 
+  local key_file
   key_file=$(resolve_key "$key_val")
-  # Track temp file for cleanup only if we created one
-  [ -f "$key_file" ] && [ "$key_file" != "$key_val" ] && tmp_key="$key_file"
-  trap '[[ -n "$tmp_key" ]] && rm -f "$tmp_key"' EXIT
 
   echo "=== Deploying to $vm_ip ==="
   ssh -i "$key_file" -o StrictHostKeyChecking=accept-new ubuntu@"$vm_ip" "
@@ -52,8 +49,6 @@ deploy_to() {
     sudo systemctl daemon-reload
   "
   echo "=== Deploy complete for $vm_ip — run: sudo systemctl enable --now velkarod ==="
-
-  [[ -n "$tmp_key" ]] && rm -f "$tmp_key" && tmp_key=""
 }
 
 if [ $# -eq 2 ]; then
