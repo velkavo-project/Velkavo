@@ -1,8 +1,6 @@
 # Velkavo
 
-Copyright (c) 2026, The Velkavo Project
-Portions Copyright (c) 2014-2024, The Monero Project
-Portions Copyright (c) 2012-2013 The Cryptonote developers.
+Copyright (c) 2026, The Velkavo Project.
 
 ## Table of Contents
 
@@ -18,7 +16,7 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## About
 
-Velkavo (VKV) is a privacy-focused cryptocurrency forked from Monero. It inherits Monero's proven cryptography, RingCT, and Dandelion++ networking while establishing an independent chain identity, coin supply, and network.
+Velkavo (VKV) is a privacy-focused cryptocurrency. It inherits proven cryptography, RingCT, and Dandelion++ networking while establishing an independent chain identity, coin supply, and network.
 
 - GitHub: [https://github.com/velkavo-project/Velkavo](https://github.com/velkavo-project/Velkavo)
 - DNS Seeds: `seeds.velkavo.com`
