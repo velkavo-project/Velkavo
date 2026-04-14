@@ -1,0 +1,14 @@
+[Unit]
+Description=Velkavo Daemon
+After=network.target
+
+[Service]
+Type=forking
+User=velkavo
+ExecStart=/usr/local/bin/velkarod --config-file /etc/velkavo/velkavo.conf --detach
+ExecStop=/usr/local/bin/velkarod --config-file /etc/velkavo/velkavo.conf stop
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

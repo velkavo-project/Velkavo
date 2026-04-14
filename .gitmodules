@@ -10,6 +10,7 @@
 [submodule "external/supercop"]
 	path = external/supercop
 	url = https://github.com/monero-project/supercop.git
+	branch = monero
 [submodule "external/gtest"]
 	path = external/gtest
 	url = https://github.com/google/googletest.git
