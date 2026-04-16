@@ -4,8 +4,8 @@
 #include "net/net_parse_helpers.h"
 #include "misc_log_ex.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2026, The Monero Project
+// Copyright (c) 2017-2026, Velkavo
 //
 // All rights reserved.
 //

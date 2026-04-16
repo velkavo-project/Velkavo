@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2024, The Monero Project
+// Copyright (c) 2014-2024, Velkavo
 //
 // All rights reserved.
 //
@@ -36,8 +36,8 @@
 #include "wipeable_string.h"
 #include "http_base.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "net.http"
 
 namespace epee
 {

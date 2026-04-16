@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2024, The Monero Project
+// Copyright (c) 2016-2024, Velkavo
 //
 // All rights reserved.
 //
@@ -48,8 +48,8 @@
 #include "common/stack_trace.h"
 #include "misc_log_ex.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "stacktrace"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "stacktrace"
 
 #define ST_LOG(x) \
   do { \
@@ -57,7 +57,7 @@
     if (elpp) { \
       std::stringstream ss; \
       ss << x; \
-      CINFO(el::base::Writer,el::base::DispatchAction::FileOnlyLog,MONERO_DEFAULT_LOG_CATEGORY) << ss.str(); \
+      CINFO(el::base::Writer,el::base::DispatchAction::FileOnlyLog,VELKAVO_DEFAULT_LOG_CATEGORY) << ss.str(); \
     } \
     else { \
       std::cout << x << std::endl; \

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2024, The Monero Project
+# Copyright (c) 2014-2024, Velkavo
 #
 # All rights reserved.
 #
@@ -39,11 +39,11 @@ set(wallet_sources
   message_transporter.cpp
 )
 
-monero_find_all_headers(wallet_private_headers "${CMAKE_CURRENT_SOURCE_DIR}")
+velkavo_find_all_headers(wallet_private_headers "${CMAKE_CURRENT_SOURCE_DIR}")
 
-monero_private_headers(wallet
+velkavo_private_headers(wallet
   ${wallet_private_headers})
-monero_add_library(wallet
+velkavo_add_library(wallet
   ${wallet_sources}
   ${wallet_private_headers})
 target_link_libraries(wallet
@@ -74,9 +74,9 @@ if(NOT IOS)
   set(wallet_rpc_private_headers
     wallet_rpc_server.h)
 
-  monero_private_headers(wallet_rpc_server
+  velkavo_private_headers(wallet_rpc_server
     ${wallet_rpc_private_headers})
-  monero_add_executable(wallet_rpc_server
+  velkavo_add_executable(wallet_rpc_server
     ${wallet_rpc_sources}
     ${wallet_rpc_headers}
     ${wallet_rpc_private_headers})
@@ -99,7 +99,7 @@ if(NOT IOS)
       ${EXTRA_LIBRARIES})
   set_property(TARGET wallet_rpc_server
     PROPERTY
-      OUTPUT_NAME "monero-wallet-rpc")
+      OUTPUT_NAME "velkavo-wallet-rpc")
   install(TARGETS wallet_rpc_server DESTINATION bin)
 endif()
 

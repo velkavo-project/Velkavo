@@ -1,0 +1,502 @@
+syntax = "proto2";
+package hw.trezor.messages.velkavo;
+
+// Sugar for easier handling in Java
+option java_package = "com.satoshilabs.trezor.lib.protobuf";
+option java_outer_classname = "TrezorMessageVelkavo";
+
+enum VelkavoNetworkType {
+    MAINNET = 0;
+    TESTNET = 1;
+    STAGENET = 2;
+    FAKECHAIN = 3;
+}
+
+/**
+ * Structure representing Velkavo transaction source entry, UTXO
+ * @embed
+ */
+message VelkavoTransactionSourceEntry {
+    repeated VelkavoOutputEntry outputs = 1;  // all outputs including decoys (forms the ring)
+    optional uint64 real_output = 2;  // index denoting which item in `outputs` is our real output (not a decoy)
+    optional bytes real_out_tx_key = 3;  // tx key located in the real output's tx
+    repeated bytes real_out_additional_tx_keys = 4;  // additional tx keys if applicable
+    optional uint64 real_output_in_tx_index = 5;  // index of our real output in the tx (aka which output was it in the transaction)
+    optional uint64 amount = 6;
+    optional bool rct = 7;  // is RingCT used (true for newer UTXOs)
+    optional bytes mask = 8;
+    optional VelkavoMultisigKLRki multisig_kLRki = 9;
+    optional uint32 subaddr_minor = 10;  // minor subaddr index UTXO was sent to
+    message VelkavoOutputEntry {
+        optional uint64 idx = 1;
+        optional VelkavoRctKeyPublic key = 2;
+        message VelkavoRctKeyPublic {
+            required bytes dest = 1;
+            required bytes commitment = 2;
+        }
+    }
+    message VelkavoMultisigKLRki {
+        optional bytes K = 1;
+        optional bytes L = 2;
+        optional bytes R = 3;
+        optional bytes ki = 4;
+    }
+}
+
+/**
+ * Structure representing Velkavo transaction destination entry
+ * @embed
+ */
+message VelkavoTransactionDestinationEntry {
+    optional uint64 amount = 1;
+    optional VelkavoAccountPublicAddress addr = 2;
+    optional bool is_subaddress = 3;
+    optional bytes original = 4;
+    optional bool is_integrated = 5;
+    /**
+     * Structure representing Velkavo public address
+     */
+    message VelkavoAccountPublicAddress {
+        optional bytes spend_public_key = 1;
+        optional bytes view_public_key = 2;
+    }
+}
+
+/**
+ * Range sig parameters / data.
+ * @embed
+ */
+message VelkavoTransactionRsigData {
+    optional uint32 rsig_type = 1;  // range signature (aka proof) type
+    optional uint32 offload_type = 2;
+    repeated uint64 grouping = 3;  // aggregation scheme for BP
+
+    optional bytes mask = 4;       // mask vector
+    optional bytes rsig = 5;       // range sig data, all of it or partial (based on rsig_parts)
+    repeated bytes rsig_parts = 6;
+    optional uint32 bp_version = 7;  // Bulletproof version
+}
+
+/**
+ * Request: Ask device for public address derived from seed and address_n
+ * @start
+ * @next VelkavoAddress
+ * @next Failure
+ */
+message VelkavoGetAddress {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional bool show_display = 2;         // Optionally show on display before sending the result
+    optional VelkavoNetworkType network_type = 3 [default=MAINNET]; // Network type
+    optional uint32 account = 4;            // Major subaddr index
+    optional uint32 minor = 5;              // Minor subaddr index
+    optional bytes payment_id = 6;          // Payment ID for integrated address
+}
+
+/**
+ * Response: Contains Velkavo watch-only credentials derived from device private seed
+ * @end
+ */
+message VelkavoAddress {
+    optional bytes address = 1;
+}
+
+/**
+ * Request: Ask device for watch only credentials
+ * @start
+ * @next VelkavoWatchKey
+ * @next Failure
+ */
+message VelkavoGetWatchKey {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional VelkavoNetworkType network_type = 2 [default=MAINNET]; // Network type
+}
+
+/**
+ * Response: Contains Velkavo watch-only credentials derived from device private seed
+ * @end
+ */
+message VelkavoWatchKey {
+    optional bytes watch_key = 1;
+    optional bytes address = 2;
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Initializes transaction signing.
+ * @start
+ * @next VelkavoTransactionInitAck
+ */
+message VelkavoTransactionInitRequest {
+    optional uint32 version = 1;
+    repeated uint32 address_n = 2;
+    optional VelkavoNetworkType network_type = 3 [default=MAINNET]; // Network type
+    optional VelkavoTransactionData tsx_data = 4;
+    /**
+     * Structure representing Velkavo initial transaction information
+     */
+    message VelkavoTransactionData {
+        optional uint32 version = 1;
+        optional bytes payment_id = 2;
+        optional uint64 unlock_time = 3;
+        repeated VelkavoTransactionDestinationEntry outputs = 4;
+        optional VelkavoTransactionDestinationEntry change_dts = 5;
+        optional uint32 num_inputs = 6;
+        optional uint32 mixin = 7;
+        optional uint64 fee = 8;
+        optional uint32 account = 9;
+        repeated uint32 minor_indices = 10;
+        optional VelkavoTransactionRsigData rsig_data = 11;
+        repeated uint32 integrated_indices = 12;
+        optional uint32 client_version = 13;  // connected client version
+        optional uint32 hard_fork = 14;       // transaction hard fork number
+        optional bytes velkavo_version = 15;   // velkavo software version
+    }
+}
+
+/**
+ * Response: Response to transaction signing initialization.
+ * @next VelkavoTransactionSetInputRequest
+ */
+message VelkavoTransactionInitAck {
+    repeated bytes hmacs = 1;
+    optional VelkavoTransactionRsigData rsig_data = 2;
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sends one UTXO to device
+ * @next VelkavoTransactionSetInputAck
+ */
+message VelkavoTransactionSetInputRequest {
+    optional VelkavoTransactionSourceEntry src_entr = 1;
+}
+
+/**
+ * Response: Response to setting UTXO for signature. Contains sealed values needed for further protocol steps.
+ * @next VelkavoTransactionSetInputAck
+ * @next VelkavoTransactionInputViniRequest
+ */
+message VelkavoTransactionSetInputAck {
+    optional bytes vini = 1;      // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 2;
+    optional bytes pseudo_out = 3;
+    optional bytes pseudo_out_hmac = 4;
+    optional bytes pseudo_out_alpha = 5;
+    optional bytes spend_key = 6;
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sends one UTXO to device together with sealed values.
+ * @next VelkavoTransactionInputViniAck
+ */
+message VelkavoTransactionInputViniRequest {
+    optional VelkavoTransactionSourceEntry src_entr = 1;
+    optional bytes vini = 2;      // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 3;
+    optional bytes pseudo_out = 4;
+    optional bytes pseudo_out_hmac = 5;
+    optional uint32 orig_idx = 6;  // original sort index, before sorting by key-images
+}
+
+/**
+ * Response: Response to setting UTXO to the device
+ * @next VelkavoTransactionInputViniRequest
+ * @next VelkavoTransactionAllInputsSetRequest
+ */
+message VelkavoTransactionInputViniAck {
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sent after all inputs have been sent. Useful for rangeisg offloading.
+ * @next VelkavoTransactionAllInputsSetAck
+ */
+message VelkavoTransactionAllInputsSetRequest {
+}
+
+/**
+ * Response: Response to after all inputs have been set.
+ * @next VelkavoTransactionSetOutputRequest
+ */
+message VelkavoTransactionAllInputsSetAck {
+    optional VelkavoTransactionRsigData rsig_data = 1;
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sends one transaction destination to device (HMACed)
+ * @next VelkavoTransactionSetOutputAck
+ */
+message VelkavoTransactionSetOutputRequest {
+    optional VelkavoTransactionDestinationEntry dst_entr = 1;
+    optional bytes dst_entr_hmac = 2;
+    optional VelkavoTransactionRsigData rsig_data = 3;
+    optional bool is_offloaded_bp = 4;  // Extra message, with offloaded BP.
+}
+
+/**
+ * Response: Response to setting transaction destination. Contains sealed values needed for further protocol steps.
+ * @next VelkavoTransactionSetOutputRequest
+ * @next VelkavoTransactionAllOutSetRequest
+ */
+message VelkavoTransactionSetOutputAck {
+    optional bytes tx_out = 1;  // xmrtypes.TxOut
+    optional bytes vouti_hmac = 2;
+    optional VelkavoTransactionRsigData rsig_data = 3;
+    optional bytes out_pk = 4;
+    optional bytes ecdh_info = 5;
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sent after all outputs are sent.
+ * @next VelkavoTransactionAllOutSetAck
+ */
+message VelkavoTransactionAllOutSetRequest {
+    optional VelkavoTransactionRsigData rsig_data = 1;
+}
+
+/**
+ * Response: After all outputs are sent the initial RCT signature fields are sent.
+ * @next VelkavoTransactionSignInputRequest
+ */
+message VelkavoTransactionAllOutSetAck {
+    optional bytes extra = 1;
+    optional bytes tx_prefix_hash = 2;
+    optional VelkavoRingCtSig rv = 4;  // xmrtypes.RctSig
+    optional bytes full_message_hash = 5;
+
+    /*
+     * Structure represents initial fields of the Velkavo RCT signature
+     */
+    message VelkavoRingCtSig {
+        optional uint64 txn_fee = 1;
+        optional bytes message = 2;
+        optional uint32 rv_type = 3;
+    }
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Sends UTXO for the signing.
+ * @next VelkavoTransactionSignInputAck
+ */
+message VelkavoTransactionSignInputRequest {
+    optional VelkavoTransactionSourceEntry src_entr = 1;
+    optional bytes vini = 2;     // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 3;
+    optional bytes pseudo_out = 4;
+    optional bytes pseudo_out_hmac = 5;
+    optional bytes pseudo_out_alpha = 6;
+    optional bytes spend_key = 7;
+    optional uint32 orig_idx = 8;  // original sort index, before sorting by key-images
+}
+
+/**
+ * Response: Contains full MG signature of the UTXO + multisig data if applicable.
+ * @next VelkavoTransactionSignInputRequest
+ * @next VelkavoTransactionFinalRequest
+ */
+message VelkavoTransactionSignInputAck {
+    optional bytes signature = 1;
+    optional bytes pseudo_out = 2;  // updated pseudo-out after mask correction
+}
+
+/**
+ * Request: Sub request of VelkavoTransactionSign. Final message of the procol after all UTXOs are signed
+ * @next VelkavoTransactionFinalAck
+ */
+message VelkavoTransactionFinalRequest {
+}
+
+/**
+ * Response: Contains transaction metadata and encryption keys needed for further transaction operations (e.g. multisig, send proof).
+ * @end
+ */
+message VelkavoTransactionFinalAck {
+    optional bytes cout_key = 1;
+    optional bytes salt = 2;
+    optional bytes rand_mult = 3;
+    optional bytes tx_enc_keys = 4;
+    optional bytes opening_key = 5;  // enc master key to decrypt CLSAGs after protocol finishes correctly
+}
+
+/**
+ * Request: Sub request of VelkavoKeyImageSync. Initializing key image sync.
+ * @start
+ * @next VelkavoKeyImageExportInitAck
+ */
+message VelkavoKeyImageExportInitRequest {
+    required uint64 num = 1;
+    required bytes hash = 2;
+    repeated uint32 address_n = 3;               // BIP-32 path to derive the key from master node
+    optional VelkavoNetworkType network_type = 4 [default=MAINNET]; // network type
+    repeated VelkavoSubAddressIndicesList subs = 5;
+    /**
+     * Structure representing Velkavo list of sub-addresses
+     */
+    message VelkavoSubAddressIndicesList {
+        required uint32 account = 1;
+        repeated uint32 minor_indices = 2;
+    }
+}
+
+/**
+ * Response: Response to key image sync initialization.
+ * @next VelkavoKeyImageSyncStepRequest
+ */
+message VelkavoKeyImageExportInitAck {
+}
+
+/**
+ * Request: Sub request of VelkavoKeyImageSync. Contains batch of the UTXO to export key image for.
+ * @next VelkavoKeyImageSyncStepAck
+ */
+message VelkavoKeyImageSyncStepRequest {
+    repeated VelkavoTransferDetails tdis = 1;
+    /**
+     * Structure representing Velkavo UTXO for key image sync
+     */
+    message VelkavoTransferDetails {
+        required bytes out_key = 1;
+        required bytes tx_pub_key = 2;
+        repeated bytes additional_tx_pub_keys = 3;
+        required uint64 internal_output_index = 4;
+        optional uint32 sub_addr_major = 5;
+        optional uint32 sub_addr_minor = 6;
+    }
+}
+
+/**
+ * Response: Response to key image sync step. Contains encrypted exported key image.
+ * @next VelkavoKeyImageSyncStepRequest
+ * @next VelkavoKeyImageSyncFinalRequest
+ */
+message VelkavoKeyImageSyncStepAck {
+    repeated VelkavoExportedKeyImage kis = 1;
+    /**
+     * Structure representing Velkavo encrypted exported key image
+     */
+    message VelkavoExportedKeyImage {
+        optional bytes iv = 1;
+        optional bytes blob = 3;
+    }
+}
+
+/**
+ * Request: Sub request of VelkavoKeyImageSync. Final message of the sync protocol.
+ * @next VelkavoKeyImageSyncFinalAck
+ */
+message VelkavoKeyImageSyncFinalRequest {
+}
+
+/**
+ * Response: Response to key image sync step. Contains encryption keys for exported key images.
+ * @end
+ */
+message VelkavoKeyImageSyncFinalAck {
+    optional bytes enc_key = 1;
+}
+
+/**
+ * Request: Decrypt tx private keys blob
+ * @next VelkavoGetTxKeyAck
+ */
+message VelkavoGetTxKeyRequest {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional VelkavoNetworkType network_type = 2 [default=MAINNET]; // network type
+
+    required bytes salt1 = 3;
+    required bytes salt2 = 4;
+    required bytes tx_enc_keys = 5;
+    required bytes tx_prefix_hash = 6;
+    optional uint32 reason = 7;  // reason to display for user. e.g., tx_proof
+    optional bytes view_public_key = 8;   // addr for derivation
+}
+
+/**
+ * Response: Response with the re-encrypted private keys and derivations blob under view key
+ * @end
+ */
+message VelkavoGetTxKeyAck {
+    optional bytes salt = 1;
+    optional bytes tx_keys = 2;
+    optional bytes tx_derivations = 3;
+}
+
+/**
+ * Request: Starts live refresh flow. Asks user permission, switches state
+ * @next VelkavoLiveRefreshStartAck
+ */
+message VelkavoLiveRefreshStartRequest {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional VelkavoNetworkType network_type = 2 [default=MAINNET]; // network type
+}
+
+/**
+ * Response after user gave permission
+ * @next VelkavoLiveRefreshStepRequest
+ * @next VelkavoLiveRefreshFinalRequest
+ */
+message VelkavoLiveRefreshStartAck {
+
+}
+
+/**
+ * Request: Request to compute a single key image during live sync
+ * @next VelkavoLiveRefreshStepAck
+ */
+message VelkavoLiveRefreshStepRequest {
+    required bytes out_key = 1;
+    required bytes recv_deriv = 2;
+    required uint64 real_out_idx = 3;
+    required uint32 sub_addr_major = 4;
+    required uint32 sub_addr_minor = 5;
+}
+
+/**
+ * Response: Response with the encrypted key image + signature
+ * @next VelkavoLiveRefreshStepRequest
+ * @next VelkavoLiveRefreshFinishedRequest
+ */
+message VelkavoLiveRefreshStepAck {
+    optional bytes salt = 1;
+    optional bytes key_image = 2;
+}
+
+/**
+ * Request: Request terminating live refresh mode.
+ * @next VelkavoLiveRefreshFinishedAck
+ */
+message VelkavoLiveRefreshFinalRequest {
+
+}
+
+/**
+ * Response: Response on termination of live refresh mode.
+ * @end
+ */
+message VelkavoLiveRefreshFinalAck {
+
+}
+
+/**
+ * Request: Universal Velkavo protocol implementation diagnosis request.
+ * @start
+ * @next DebugVelkavoDiagAck
+ */
+message DebugVelkavoDiagRequest {
+    optional uint64 ins = 1;
+    optional uint64 p1 = 2;
+    optional uint64 p2 = 3;
+    repeated uint64 pd = 4;
+    optional bytes data1 = 5;
+    optional bytes data2 = 6;
+}
+
+/**
+ * Response: Response to Velkavo diagnosis protocol.
+ * @end
+ */
+message DebugVelkavoDiagAck {
+    optional uint64 ins = 1;
+    optional uint64 p1 = 2;
+    optional uint64 p2 = 3;
+    repeated uint64 pd = 4;
+    optional bytes data1 = 5;
+    optional bytes data2 = 6;
+}

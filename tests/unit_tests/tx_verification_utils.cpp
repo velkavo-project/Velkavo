@@ -1,4 +1,4 @@
-// Copyright (c) 2025, The Monero Project
+// Copyright (c) 2025, Velkavo
 //
 // All rights reserved.
 //
@@ -108,7 +108,7 @@ TEST(tx_verification_utils, ver_input_proofs_rings)
     sources.reserve(N_INPUTS);
     for (size_t i = 0; i < N_INPUTS; ++i)
     {
-        const rct::xmr_amount in_amount = crypto::rand_range<rct::xmr_amount>(0, COIN) + COIN; // [1, 2] XMR
+        const rct::xmr_amount in_amount = crypto::rand_range<rct::xmr_amount>(0, COIN) + COIN; // [1, 2] VKV
         const size_t real_in_ring_idx = crypto::rand_idx(N_RING_MEMBERS);
 
         // generate one-time address from derivation
@@ -167,7 +167,7 @@ TEST(tx_verification_utils, ver_input_proofs_rings)
     }
 
     // populate destinations
-    const rct::xmr_amount approx_fee = 500000000000; // 0.5 XMR
+    const rct::xmr_amount approx_fee = 500000000000; // 0.5 VKV
     const rct::xmr_amount dest_amount = (total_input_amounts - approx_fee) / N_OUTPUTS;
     std::vector<cryptonote::tx_destination_entry> destinations;
     destinations.reserve(N_OUTPUTS);

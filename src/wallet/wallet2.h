@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2024, The Monero Project
+// Copyright (c) 2014-2024, Velkavo
 // 
 // All rights reserved.
 // 
@@ -74,8 +74,8 @@
 #include "fee_priority.h"
 #include "fee_algorithm.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "wallet.wallet2"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "wallet.wallet2"
 
 class Serialization_portability_wallet_Test;
 class wallet_accessor_test;
@@ -1369,7 +1369,7 @@ private:
     }
 
     BEGIN_SERIALIZE_OBJECT()
-      MAGIC_FIELD("monero wallet cache")
+      MAGIC_FIELD("velkavo wallet cache")
       VERSION_FIELD(2)
       FIELD(m_blockchain)
       FIELD(m_transfers)

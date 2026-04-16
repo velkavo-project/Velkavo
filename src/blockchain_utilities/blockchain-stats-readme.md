@@ -1,19 +1,19 @@
-# Monero Blockchain Stats
+# Velkavo Blockchain Stats
 
-Monero Blockchain Stats utlity exports daily statistics for the monero blockchain from creation through current state.
+Velkavo Blockchain Stats utlity exports daily statistics for the velkavo blockchain from creation through current state.
 
 ## Usage:
 
-See also the utility's help option. `monero-blockchain-stats --help`
+See also the utility's help option. `velkavo-blockchain-stats --help`
 
 From the command line run:
 
-`$ monero-blockchain-stats`
+`$ velkavo-blockchain-stats`
 
 This loads the existing blockchain and prints the results to the terminal. Default printed data includes Blocks per Day, Total Blocks, Transactions per Day, Total Transactions, Bytes per Day and Total Bytes. The format of the output is in tab delimited csv which is printed to the console. Redirecting or piping the output of the command allows for saving the output to a csv file or feeding your own script accordingly, i.e.:
 
-- `monero-blockchain-stats > stats-$(date +'%Y-%m-%d').csv`
-- `monero-blockchain-stats | save-to-database.sh`
+- `velkavo-blockchain-stats > stats-$(date +'%Y-%m-%d').csv`
+- `velkavo-blockchain-stats | save-to-database.sh`
 
 ### Options
 `--data-dir arg` 

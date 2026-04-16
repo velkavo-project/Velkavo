@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2024, The Monero Project
+# Copyright (c) 2014-2024, Velkavo
 #
 # All rights reserved.
 #
@@ -31,8 +31,8 @@ source_group(p2p FILES ${P2P})
 
 #add_library(p2p ${P2P})
 
-#monero_private_headers(p2p ${P2P})
-monero_add_library(p2p ${P2P})
+#velkavo_private_headers(p2p ${P2P})
+velkavo_add_library(p2p ${P2P})
 target_link_libraries(p2p
   PUBLIC
     version

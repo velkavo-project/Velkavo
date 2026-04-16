@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024, The Monero Project
+// Copyright (c) 2019-2024, Velkavo
 //
 // All rights reserved.
 //
@@ -37,8 +37,8 @@
 #include "common/dns_utils.h"
 #include "version.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "debugtools.dnschecks"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "debugtools.dnschecks"
 
 namespace po = boost::program_options;
 
@@ -121,28 +121,28 @@ int main(int argc, char* argv[])
 
   if (command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Velkavo '" << VELKAVO_RELEASE_NAME << "' (v" << VELKAVO_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
     return 1;
   }
 
   mlog_configure("", true);
-  mlog_set_categories("+" MONERO_DEFAULT_LOG_CATEGORY ":INFO");
+  mlog_set_categories("+" VELKAVO_DEFAULT_LOG_CATEGORY ":INFO");
 
   lookup(LOOKUP_A, {"seeds.velkavo.com"});
 
-  lookup(LOOKUP_TXT, {"updates.moneropulse.org", "updates.moneropulse.net", "updates.moneropulse.co", "updates.moneropulse.se", "updates.moneropulse.fr", "updates.moneropulse.de", "updates.moneropulse.ch"});
+  lookup(LOOKUP_TXT, {"updates.velkavo.com", "updates.velkavo.com", "updates.velkavo.com", "updates.velkavo.com", "updates.velkavo.com", "updates.velkavo.com", "updates.velkavo.com"});
 
-  lookup(LOOKUP_TXT, {"checkpoints.moneropulse.org", "checkpoints.moneropulse.net", "checkpoints.moneropulse.co", "checkpoints.moneropulse.se"});
+  lookup(LOOKUP_TXT, {"checkpoints.velkavo.com", "checkpoints.velkavo.com", "checkpoints.velkavo.com", "checkpoints.velkavopulse.se"});
 
   // those are in the code, but don't seem to actually exist
 #if 0
-  lookup(LOOKUP_TXT, {"testpoints.moneropulse.org", "testpoints.moneropulse.net", "testpoints.moneropulse.co", "testpoints.moneropulse.se");
+  lookup(LOOKUP_TXT, {"testpoints.velkavo.com", "testpoints.velkavo.com", "testpoints.velkavo.com", "testpoints.velkavopulse.se");
 
-  lookup(LOOKUP_TXT, {"stagenetpoints.moneropulse.org", "stagenetpoints.moneropulse.net", "stagenetpoints.moneropulse.co", "stagenetpoints.moneropulse.se"});
+  lookup(LOOKUP_TXT, {"stagenetpoints.velkavopulse.org", "stagenetpoints.velkavopulse.net", "stagenetpoints.velkavopulse.co", "stagenetpoints.velkavopulse.se"});
 #endif
 
-  lookup(LOOKUP_TXT, {"segheights.moneropulse.org", "segheights.moneropulse.net", "segheights.moneropulse.co", "segheights.moneropulse.se"});
+  lookup(LOOKUP_TXT, {"segheights.velkavopulse.org", "segheights.velkavopulse.net", "segheights.velkavopulse.co", "segheights.velkavopulse.se"});
 
   return 0;
   CATCH_ENTRY_L0("main", 1);

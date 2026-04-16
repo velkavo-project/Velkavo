@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2018-2024, The Monero Project
+# Copyright (c) 2018-2024, Velkavo
 
 # 
 # All rights reserved.
@@ -362,7 +362,7 @@ class P2PTest():
         MEMPOOL_TX_TARGET = 2 * 8192 # 2x previous ver_rct_non_semantics_simple_cached() cache size
         n_mempool_txs = 0
         unlocked_inputs = update_unlocked_inputs()
-        last_fee = 10000000000 # 0.01 XMR to start off with is an over-estimation for a 1/16 in the penalty-free zone
+        last_fee = 10000000000 # 0.01 VKV to start off with is an over-estimation for a 1/16 in the penalty-free zone
 
         print_progress = lambda action: \
             print('        Progress: {}/{} ({:.1f}%) txs in mempool, {} usable inputs, {} blocks mined, just {} {}'.format(

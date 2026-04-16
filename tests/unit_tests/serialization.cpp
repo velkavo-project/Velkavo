@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2024, The Monero Project
+// Copyright (c) 2014-2024, Velkavo
 // 
 // All rights reserved.
 // 
@@ -841,7 +841,7 @@ TEST(Serialization, portability_wallet)
   }
 }
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Monero output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Velkavo output export\003"
 TEST(Serialization, portability_outputs)
 {
   // read file

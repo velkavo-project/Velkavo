@@ -103,5 +103,5 @@ cp .env.example .env
 
 Copyright (c) 2026, The Velkavo Project
 
-Portions of this software are derived from the Monero Project, which is
+Portions of this software are derived from the Velkavo Project, which is
 licensed under the BSD 3-Clause License. See [LICENSE](LICENSE) for details.

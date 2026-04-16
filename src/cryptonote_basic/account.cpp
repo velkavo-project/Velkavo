@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2024, The Monero Project
+// Copyright (c) 2014-2024, Velkavo
 // 
 // All rights reserved.
 // 
@@ -42,8 +42,8 @@ extern "C"
 #include "cryptonote_format_utils.h"
 #include "cryptonote_config.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "account"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "account"
 
 using namespace std;
 

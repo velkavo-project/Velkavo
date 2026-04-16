@@ -3,10 +3,9 @@ Description=Velkavo Daemon
 After=network.target
 
 [Service]
-Type=forking
+Type=simple
 User=velkavo
-ExecStart=/usr/local/bin/velkarod --config-file /etc/velkavo/velkavo.conf --detach
-ExecStop=/usr/local/bin/velkarod --config-file /etc/velkavo/velkavo.conf stop
+ExecStart=/usr/local/bin/velkarod --config-file /etc/velkavo/velkavo.conf --non-interactive
 Restart=on-failure
 RestartSec=30
 

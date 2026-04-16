@@ -7,7 +7,7 @@
 
 ## Context
 
-VelkavoV2 is a fork of Monero being established as an independent blockchain called **Velkavo (VKV)**. The goal of this first milestone is to give Velkavo its own chain identity (genesis blocks, network IDs, coin name, address format) and launch the initial 2-node network on Oracle Cloud VMs — with peer discovery that doesn't depend on a single point of failure.
+VelkavoV2 is a fork of Velkavo being established as an independent blockchain called **Velkavo (VKV)**. The goal of this first milestone is to give Velkavo its own chain identity (genesis blocks, network IDs, coin name, address format) and launch the initial 2-node network on Oracle Cloud VMs — with peer discovery that doesn't depend on a single point of failure.
 
 ---
 
@@ -27,7 +27,7 @@ VelkavoV2 is a fork of Monero being established as an independent blockchain cal
 Three networks are configured: mainnet, testnet, stagenet. Each gets:
 - A fresh genesis coinbase transaction (GENESIS_TX hex) generated via the built-in genesis tool
 - A new genesis nonce
-- A new random UUID as the Network ID (prevents cross-network peer connections with Monero)
+- A new random UUID as the Network ID (prevents cross-network peer connections with Velkavo)
 - Distinct port assignments
 
 | Network | P2P Port | RPC Port | ZMQ Port |
@@ -40,7 +40,7 @@ Three networks are configured: mainnet, testnet, stagenet. Each gets:
 
 ## Genesis Block Generation
 
-Each network's genesis block is generated using Monero's built-in genesis generation tool (already present in the codebase). The resulting GENESIS_TX hex string and nonce are hardcoded into `src/cryptonote_config.h` — one set per network. This is a one-time operation; the genesis block never changes once the chain is live.
+Each network's genesis block is generated using Velkavo's built-in genesis generation tool (already present in the codebase). The resulting GENESIS_TX hex string and nonce are hardcoded into `src/cryptonote_config.h` — one set per network. This is a one-time operation; the genesis block never changes once the chain is live.
 
 ---
 
@@ -70,10 +70,10 @@ Each network's genesis block is generated using Monero's built-in genesis genera
 |---|---|
 | `src/cryptonote_config.h` | Coin name, ticker, new ports, new network UUIDs, fresh GENESIS_TX + nonce for all 3 networks |
 | `src/cryptonote_basic/cryptonote_basic.h` | Address prefix numeric value producing `VKV` in base58 encoding |
-| `src/p2p/net_node.inl` | Replace Monero's DNS seed hostnames with `seeds.velkavo.com` |
-| `CMakeLists.txt` | Rename binary output from `monerod` → `velkarod` |
+| `src/p2p/net_node.inl` | Replace Velkavo's DNS seed hostnames with `seeds.velkavo.com` |
+| `CMakeLists.txt` | Rename binary output from `velkarod` → `velkarod` |
 
-No architectural changes. All changes are configuration and identity — the Monero consensus engine, crypto, and networking stack are preserved.
+No architectural changes. All changes are configuration and identity — the Velkavo consensus engine, crypto, and networking stack are preserved.
 
 ---
 

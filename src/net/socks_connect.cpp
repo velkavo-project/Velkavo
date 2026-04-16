@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024, The Monero Project
+// Copyright (c) 2019-2024, Velkavo
 //
 // All rights reserved.
 //
@@ -87,7 +87,7 @@ namespace socks
             boost::promise<boost::asio::ip::tcp::socket> result{};
             out = result.get_future();
             const auto proxy = net::socks::make_connect_client(
-                boost::asio::ip::tcp::socket{MONERO_GET_EXECUTOR(timeout)}, proxy_address->ver, future_socket{std::move(result)}
+                boost::asio::ip::tcp::socket{VELKAVO_GET_EXECUTOR(timeout)}, proxy_address->ver, future_socket{std::move(result)}
             );
 
             if (epee::string_tools::get_ip_int32_from_string(ip_address, remote_host))

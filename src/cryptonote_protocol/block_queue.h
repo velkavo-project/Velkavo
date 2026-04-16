@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, The Monero Project
+// Copyright (c) 2017-2024, Velkavo
 // 
 // All rights reserved.
 // 
@@ -39,8 +39,8 @@
 #include "net/net_utils_base.h"
 #include "crypto/crypto.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "cn.block_queue"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "cn.block_queue"
 
 namespace cryptonote
 {

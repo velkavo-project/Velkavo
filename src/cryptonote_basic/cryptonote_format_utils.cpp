@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2024, The Monero Project
+// Copyright (c) 2014-2024, Velkavo
 // 
 // All rights reserved.
 // 
@@ -42,8 +42,8 @@
 
 using namespace epee;
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "cn"
+#undef VELKAVO_DEFAULT_LOG_CATEGORY
+#define VELKAVO_DEFAULT_LOG_CATEGORY "cn"
 
 // #define ENABLE_HASH_CASH_INTEGRITY_CHECK
 
@@ -1138,15 +1138,15 @@ namespace cryptonote
     switch (decimal_point)
     {
       case 12:
-        return "monero";
+        return "velkavo";
       case 9:
-        return "millinero";
+        return "millivkavo";
       case 6:
-        return "micronero";
+        return "microvkavo";
       case 3:
-        return "nanonero";
+        return "nanovkavo";
       case 0:
-        return "piconero";
+        return "picovkavo";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
     }
