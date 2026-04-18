@@ -3,14 +3,14 @@
 	url = https://github.com/miniupnp/miniupnp.git
 [submodule "external/randomx"]
 	path = external/randomx
-	url = https://github.com/tevador/RandomX.git
+	url = https://github.com/velkavo-project/RandomX.git
 [submodule "external/rapidjson"]
 	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
 [submodule "external/supercop"]
 	path = external/supercop
-	url = https://github.com/monero-project/supercop.git
-	branch = monero
+	url = https://github.com/velkavo-project/supercop.git
+	branch = velkavo
 [submodule "external/gtest"]
 	path = external/gtest
 	url = https://github.com/google/googletest.git
