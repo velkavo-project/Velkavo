@@ -28,6 +28,14 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
+# Ensure supercop crypto functions are available when this file is processed
+# independently (e.g. IDE or subdirectory builds that bypass the root CMakeLists).
+#
+if (NOT COMMAND velkavo_crypto_autodetect)
+  include(${CMAKE_SOURCE_DIR}/external/supercop/functions.cmake)
+endif()
+
+#
 # Possibly user defined values.
 #
 set(VELKAVO_WALLET_CRYPTO_LIBRARY "auto" CACHE STRING "Select a wallet crypto library")

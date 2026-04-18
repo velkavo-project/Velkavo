@@ -15,9 +15,8 @@ This guide covers macOS in full detail. Linux instructions are included at the e
    - [3. Install Homebrew](#3-install-homebrew)
    - [4. Install build dependencies](#4-install-build-dependencies)
    - [5. Clone the repository and submodules](#5-clone-the-repository-and-submodules)
-   - [6. Apply the wallet-crypto CMake fix](#6-apply-the-wallet-crypto-cmake-fix)
-   - [7. Configure with cmake](#7-configure-with-cmake)
-   - [8. Compile the daemon](#8-compile-the-daemon)
+   - [6. Configure with cmake](#6-configure-with-cmake)
+   - [7. Compile the daemon](#7-compile-the-daemon)
 3. [Linux: Build from Source](#linux-build-from-source)
 4. [Configuration](#configuration)
 5. [Running the Node](#running-the-node)
@@ -222,35 +221,7 @@ git submodule status
 
 ---
 
-### 6. Apply the wallet-crypto CMake fix
-
-The current source tree is missing the definition of a CMake function called `velkavo_crypto_autodetect`. Without this patch, cmake will abort with:
-
-```
-CMake Error at src/crypto/wallet/CMakeLists.txt:39 (velkavo_crypto_autodetect):
-  Unknown CMake command "velkavo_crypto_autodetect".
-```
-
-**Apply the fix** by opening `src/crypto/wallet/CMakeLists.txt` and inserting the following stub immediately before the line `if (${VELKAVO_WALLET_CRYPTO_LIBRARY} STREQUAL "auto")` (around line 38):
-
-```cmake
-if (NOT COMMAND velkavo_crypto_autodetect)
-  function(velkavo_crypto_autodetect AVAILABLE_VAR BEST_VAR)
-    # Stub: no external wallet crypto backends; fall back to internal "cn"
-  endfunction()
-endif()
-```
-
-**What this does:** The autodetect function is supposed to search for optional external crypto backends and set a `BEST` variable. Because it is not defined, we provide an empty stub. The empty stub leaves `BEST` unset, so cmake falls through to the default `set(VELKAVO_WALLET_CRYPTO_LIBRARY "cn")` — the internal CryptoNight implementation — which is the correct and fully supported option on macOS.
-
-**Or apply it as a one-liner from the repo root:**
-```bash
-sed -i '' '38s/.*/if (NOT COMMAND velkavo_crypto_autodetect)\n  function(velkavo_crypto_autodetect AVAILABLE_VAR BEST_VAR)\n    # Stub: fall back to internal "cn"\n  endfunction()\nendif()\n\n&/' src/crypto/wallet/CMakeLists.txt
-```
-
----
-
-### 7. Configure with cmake
+### 6. Configure with cmake
 
 Create a dedicated build directory (keeps the source tree clean) and run cmake from inside it:
 
@@ -299,7 +270,7 @@ Defaulting to internal crypto library for wallet
 
 ---
 
-### 8. Compile the daemon
+### 7. Compile the daemon
 
 From inside `build/release`:
 
@@ -339,7 +310,7 @@ You will see output like:
 - `error: use of undeclared identifier`: usually a missing dependency. Re-check step 4.
 - Ran out of memory during link: reduce parallelism: `make daemon -j2`.
 - `ld: library not found for -lssl`: OpenSSL not linked. Add to cmake: `-DOPENSSL_ROOT_DIR=$(brew --prefix openssl)`.
-- Compile errors in `src/crypto`: ensure step 6 (the wallet-crypto patch) was applied correctly.
+- Compile errors in `src/crypto`: ensure submodules are fully initialized (`git submodule update --init --recursive`).
 
 ---
 
@@ -353,14 +324,11 @@ sudo apt-get install build-essential cmake pkg-config \
   libsodium-dev libhidapi-dev liblzma-dev libreadline-dev
 ```
 
-**Clone, patch, and build:**
+**Clone and build:**
 ```bash
 git clone https://github.com/velkavo-project/Velkavo.git
 cd Velkavo
 git submodule update --init --recursive
-
-# Apply the wallet-crypto CMake fix (same as macOS step 6)
-sed -i '38s/.*/if (NOT COMMAND velkavo_crypto_autodetect)\n  function(velkavo_crypto_autodetect AVAILABLE_VAR BEST_VAR)\n  endfunction()\nendif()\n\n&/' src/crypto/wallet/CMakeLists.txt
 
 mkdir -p build/release && cd build/release
 cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..
@@ -798,11 +766,6 @@ git pull
 
 # Update submodules (new submodule versions may be pinned)
 git submodule update --init --recursive
-
-# Reapply the wallet-crypto fix if it was lost (check first)
-grep -q "velkavo_crypto_autodetect" src/crypto/wallet/CMakeLists.txt \
-  && echo "fix already present" \
-  || echo "fix needed — reapply step 6"
 
 # Rebuild (cmake reconfigures automatically on changes)
 cd build/release

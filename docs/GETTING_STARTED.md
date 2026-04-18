@@ -87,13 +87,7 @@ git clone --recurse-submodules https://github.com/velkavo-project/Velkavo.git
 cd Velkavo
 ```
 
-**5. Apply the wallet-crypto CMake fix**
-
-```bash
-sed -i '' '38s/.*/if (NOT COMMAND velkavo_crypto_autodetect)\n  function(velkavo_crypto_autodetect AVAILABLE_VAR BEST_VAR)\n    # Stub: fall back to internal "cn"\n  endfunction()\nendif()\n\n&/' src/crypto/wallet/CMakeLists.txt
-```
-
-**6. Build**
+**5. Build**
 
 ```bash
 mkdir -p build/release && cd build/release
@@ -137,9 +131,6 @@ sudo apt-get install -y build-essential cmake pkg-config \
 ```bash
 git clone --recurse-submodules https://github.com/velkavo-project/Velkavo.git
 cd Velkavo
-
-# Apply the wallet-crypto fix
-sed -i '38s/.*/if (NOT COMMAND velkavo_crypto_autodetect)\n  function(velkavo_crypto_autodetect AVAILABLE_VAR BEST_VAR)\n  endfunction()\nendif()\n\n&/' src/crypto/wallet/CMakeLists.txt
 
 mkdir -p build/release && cd build/release
 cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..
