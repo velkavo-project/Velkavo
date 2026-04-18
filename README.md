@@ -18,7 +18,9 @@ Copyright (c) 2026, The Velkavo Project.
 
 Velkavo (VKV) is a privacy-focused cryptocurrency.
 
-For full instructions on running a node, mining, and configuration see the **[Operator Guide](docs/GUIDE.md)**. It inherits proven cryptography, RingCT, and Dandelion++ networking while establishing an independent chain identity, coin supply, and network.
+**New to Velkavo? Start here: [Getting Started Guide](docs/GETTING_STARTED.md)** — covers building, running a node, creating a wallet, mining, and sending VKV in one place.
+
+For operator/server deployment see the **[Operator Guide](docs/GUIDE.md)**. Velkavo inherits proven cryptography, RingCT, and Dandelion++ networking while establishing an independent chain identity, coin supply, and network.
 
 - GitHub: [https://github.com/velkavo-project/Velkavo](https://github.com/velkavo-project/Velkavo)
 - DNS Seeds: `seeds.velkavo.com`
