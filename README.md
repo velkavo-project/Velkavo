@@ -61,7 +61,7 @@ brew install cmake boost openssl zmq unbound libsodium hidapi readline
 ### Build
 
 ```bash
-git clone https://github.com/velkavo-project/Velkavo.git
+git clone --recurse-submodules https://github.com/velkavo-project/Velkavo.git
 cd Velkavo
 mkdir -p build/release && cd build/release
 cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..

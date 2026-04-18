@@ -10,3 +10,9 @@
 # Build artifacts
 build/
 temp_ubuntu_build/
+
+# claude-mem plugin data
+.claude-mem/
+
+# firecrawl scrape cache
+.firecrawl/

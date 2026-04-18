@@ -48,13 +48,15 @@ brew install cmake boost openssl zmq unbound libsodium hidapi readline
 
 **Build:**
 ```bash
-git clone https://github.com/velkavo-project/Velkavo.git
+git clone --recurse-submodules https://github.com/velkavo-project/Velkavo.git
 cd Velkavo
 mkdir -p build/release && cd build/release
 cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..
 make daemon -j$(nproc)   # Linux
 make daemon -j$(sysctl -n hw.logicalcpu)   # macOS
 ```
+
+> If you already cloned without `--recurse-submodules`, run `git submodule update --init --recursive` before cmake.
 
 Output: `build/release/bin/velkarod`
 
