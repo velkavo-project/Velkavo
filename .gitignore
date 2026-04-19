@@ -19,3 +19,4 @@ temp_ubuntu_build/
 
 # firecrawl scrape cache
 .firecrawl/
+.worktrees/
