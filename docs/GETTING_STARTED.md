@@ -12,6 +12,7 @@ This guide covers everything you need to go from zero to mining and sending VKV.
 2. [Build from Source](#build-from-source)
    - [macOS](#macos)
    - [Linux (Ubuntu/Debian)](#linux-ubuntudebian)
+   - [Windows](#windows)
 3. [Running a Node](#running-a-node)
    - [Configuration](#configuration)
    - [Start the Node](#start-the-node)
@@ -34,7 +35,7 @@ This guide covers everything you need to go from zero to mining and sending VKV.
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| OS | macOS 13 / Ubuntu 20.04 | macOS 14+ / Ubuntu 22.04+ |
+| OS | macOS 13 / Ubuntu 20.04 / Windows 10 64-bit | macOS 14+ / Ubuntu 22.04+ / Windows 11 64-bit |
 | CPU | 2 cores | 8+ cores (for mining) |
 | RAM | 2 GB | 4 GB+ (2 GB per mining thread) |
 | Disk | 50 GB free SSD | 100 GB+ SSD |
@@ -146,15 +147,83 @@ sudo cp build/release/bin/velkavo-wallet-cli /usr/local/bin/
 
 ---
 
+### Windows
+
+Windows builds use **MSYS2** with the MinGW-w64 toolchain. All commands below are run inside the **MSYS2 MinGW 64-bit** shell (not PowerShell, not CMD).
+
+**1. Install MSYS2**
+
+Download and run the installer from [msys2.org](https://www.msys2.org). After installation, open the **MSYS2 MinGW 64-bit** shortcut from the Start menu.
+
+**2. Update the package database**
+
+```bash
+pacman -Syu
+```
+
+Close and reopen the shell when prompted, then run:
+
+```bash
+pacman -Su
+```
+
+**3. Install build dependencies**
+
+```bash
+pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
+  mingw-w64-x86_64-boost mingw-w64-x86_64-openssl \
+  mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium \
+  mingw-w64-x86_64-hidapi mingw-w64-x86_64-readline \
+  git make
+```
+
+When prompted to select packages from the `toolchain` group, press Enter to install all.
+
+**4. Clone the repository**
+
+```bash
+git clone --recurse-submodules https://github.com/velkavo-project/Velkavo.git
+cd Velkavo
+```
+
+**5. Build**
+
+```bash
+mkdir -p build/release && cd build/release
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../..
+mingw32-make -j$(nproc)
+```
+
+Build time: ~20–30 min depending on CPU speed.
+
+**Binaries are in `build\release\bin\`:**
+
+| Binary | Purpose |
+|--------|---------|
+| `velkarod.exe` | Node daemon |
+| `velkavo-wallet-cli.exe` | Wallet command-line interface |
+
+Verify (still inside the MSYS2 shell):
+
+```bash
+./build/release/bin/velkarod.exe --version
+# Velkavo 'Fluorine Fermi' (v0.18.1.0-...)
+```
+
+> You can copy the `.exe` files out of the MSYS2 environment and run them from a normal Command Prompt or PowerShell window. They are self-contained.
+
+---
+
 ## Running a Node
 
 A node connects you to the Velkavo network, validates transactions, and is required for mining and sending transactions. You do not need to mine to run a node.
 
 ### Configuration
 
+**macOS / Linux**
+
 Create the data directory and config file:
 
-**macOS:**
 ```bash
 mkdir -p ~/.velkavo
 ```
@@ -163,7 +232,8 @@ Create `~/.velkavo/velkavo.conf`:
 
 ```ini
 # Paths
-data-dir=/Users/YOUR_USERNAME/.velkavo
+data-dir=/Users/YOUR_USERNAME/.velkavo       # macOS
+# data-dir=/var/lib/velkavo                  # Linux (system service)
 log-file=/Users/YOUR_USERNAME/.velkavo/velkarod.log
 log-level=1
 max-log-file-size=104857600
@@ -188,11 +258,37 @@ limit-rate-down=32768
 
 Replace `YOUR_USERNAME` with the output of `whoami`.
 
-**Linux** — same content, stored at `/etc/velkavo/velkavo.conf` with paths like:
-```ini
-data-dir=/var/lib/velkavo
-log-file=/var/log/velkavo/velkarod.log
+**Windows**
+
+Create the data directory in File Explorer or Command Prompt:
+
+```cmd
+mkdir %USERPROFILE%\velkavo
 ```
+
+Create `%USERPROFILE%\velkavo\velkavo.conf` in Notepad:
+
+```ini
+data-dir=C:\Users\YOUR_USERNAME\velkavo
+log-file=C:\Users\YOUR_USERNAME\velkavo\velkarod.log
+log-level=1
+max-log-file-size=104857600
+max-log-files=5
+
+p2p-bind-port=19080
+p2p-external-port=19080
+
+rpc-bind-ip=127.0.0.1
+rpc-bind-port=19081
+
+out-peers=64
+in-peers=128
+
+limit-rate-up=8192
+limit-rate-down=32768
+```
+
+Replace `YOUR_USERNAME` with your actual Windows username.
 
 **Config options reference:**
 
@@ -213,15 +309,15 @@ log-file=/var/log/velkavo/velkarod.log
 
 ### Start the Node
 
-**Foreground (test / verify it works):**
+**macOS / Linux — Foreground (test / verify it works):**
 
 ```bash
 velkarod --config-file ~/.velkavo/velkavo.conf --non-interactive
 ```
 
-Press `Ctrl+C` to stop. The node discovers peers automatically via `seeds.velkavo.com`.
+Press `Ctrl+C` to stop.
 
-**Background (detached, no service manager):**
+**macOS / Linux — Background (detached, no service manager):**
 
 ```bash
 velkarod \
@@ -234,6 +330,22 @@ Stop it:
 ```bash
 kill $(cat ~/.velkavo/velkarod.pid)
 ```
+
+**Windows — Command Prompt:**
+
+```cmd
+velkarod.exe --config-file %USERPROFILE%\velkavo\velkavo.conf --non-interactive
+```
+
+Press `Ctrl+C` to stop.
+
+**Windows — Run minimized in the background:**
+
+```cmd
+start /min velkarod.exe --config-file %USERPROFILE%\velkavo\velkavo.conf --non-interactive
+```
+
+The node discovers peers automatically via `seeds.velkavo.com`.
 
 ---
 
@@ -339,9 +451,56 @@ sudo systemctl enable --now velkarod
 | Status | `sudo systemctl status velkarod` |
 | View logs | `sudo journalctl -fu velkarod` |
 
+#### Windows — Task Scheduler
+
+Task Scheduler runs velkarod automatically at login without needing a third-party service manager.
+
+1. Open **Task Scheduler** (search for it in the Start menu)
+2. Click **Create Task** (not "Create Basic Task")
+3. **General tab:**
+   - Name: `Velkavo Node`
+   - Check **Run whether user is logged on or not** if you want it to run even when your screen is locked
+   - Check **Run with highest privileges**
+4. **Triggers tab:** Click New → Begin the task: **At log on**
+5. **Actions tab:** Click New
+   - Program/script: `C:\path\to\velkarod.exe`
+   - Add arguments: `--config-file C:\Users\YOUR_USERNAME\velkavo\velkavo.conf --non-interactive`
+6. **Settings tab:** Check **If the task fails, restart every: 1 minute**
+7. Click OK and enter your Windows password when prompted
+
+To manage the task:
+
+| Action | How |
+|--------|-----|
+| Start now | Right-click task → Run |
+| Stop | Right-click task → End |
+| View logs | Open `%USERPROFILE%\velkavo\velkarod.log` in Notepad |
+| Disable | Right-click task → Disable |
+
+**Alternative — Windows Service via NSSM**
+
+[NSSM](https://nssm.cc) (Non-Sucking Service Manager) installs velkarod as a proper Windows service that starts before login:
+
+```cmd
+nssm install velkarod "C:\path\to\velkarod.exe"
+nssm set velkarod AppParameters "--config-file C:\Users\YOUR_USERNAME\velkavo\velkavo.conf --non-interactive"
+nssm set velkarod AppStdout "C:\Users\YOUR_USERNAME\velkavo\velkarod.log"
+nssm set velkarod AppStderr "C:\Users\YOUR_USERNAME\velkavo\velkarod.err"
+nssm start velkarod
+```
+
+| Action | Command |
+|--------|---------|
+| Start | `nssm start velkarod` |
+| Stop | `nssm stop velkarod` |
+| Restart | `nssm restart velkarod` |
+| Remove | `nssm remove velkarod confirm` |
+
 ---
 
 ### Check Node Status
+
+**macOS / Linux:**
 
 ```bash
 curl -s http://127.0.0.1:19081/get_info | python3 -m json.tool
@@ -359,6 +518,12 @@ print(f'Height:  {h} / {t}  ({pct:.1f}% synced)')
 print(f'Peers:   {d[\"outgoing_connections_count\"]} out / {d[\"incoming_connections_count\"]} in')
 print(f'Status:  {d[\"status\"]}  |  Synchronized: {d[\"synchronized\"]}')
 "
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:19081/get_info | Select-Object height, target_height, synchronized, status
 ```
 
 Key fields:
@@ -380,15 +545,24 @@ Key fields:
 Build the wallet CLI first (if you only built the daemon):
 
 ```bash
-cd build/release
-make velkavo-wallet-cli -j$(sysctl -n hw.logicalcpu)   # macOS
-make velkavo-wallet-cli -j$(nproc)                      # Linux
+# macOS
+cd build/release && make velkavo-wallet-cli -j$(sysctl -n hw.logicalcpu)
+
+# Linux
+cd build/release && make velkavo-wallet-cli -j$(nproc)
+
+# Windows (MSYS2 shell)
+cd build/release && mingw32-make velkavo-wallet-cli -j$(nproc)
 ```
 
 **Create a new wallet:**
 
 ```bash
+# macOS / Linux
 ./build/release/bin/velkavo-wallet-cli --generate-new-wallet ~/my-wallet
+
+# Windows (Command Prompt)
+velkavo-wallet-cli.exe --generate-new-wallet %USERPROFILE%\my-wallet
 ```
 
 You will be asked to set a password. Choose a strong one.
@@ -435,7 +609,11 @@ balance       # shows your balance
 If you have your 25-word seed phrase but lost your wallet file:
 
 ```bash
+# macOS / Linux
 ./build/release/bin/velkavo-wallet-cli --restore-deterministic-wallet
+
+# Windows
+velkavo-wallet-cli.exe --restore-deterministic-wallet
 ```
 
 You will be asked to:
@@ -510,34 +688,12 @@ Block reward starts at **17.592186 VKV** and decreases over time. Early-network 
 
 The node daemon includes a built-in miner. Lower hashrate than XMRig but requires no extra software.
 
-**If your node is running interactively (without `--non-interactive`):**
-
-Connect to the daemon console and run:
-```
-start_mining <YOUR_WALLET_ADDRESS> <THREADS>
-```
-
-Example:
-```
-start_mining VKVabc123... 6
-```
-
-Check status:
-```
-mining_status
-```
-
-Stop:
-```
-stop_mining
-```
-
 **If your node is running with `--non-interactive` (background service):**
 
 Use the RPC API:
 
 ```bash
-# Start mining
+# macOS / Linux — Start mining
 curl -s http://127.0.0.1:19081/start_mining \
   -d '{
     "do_background_mining": false,
@@ -553,6 +709,18 @@ curl -s http://127.0.0.1:19081/mining_status | python3 -m json.tool
 # Stop mining
 curl -s http://127.0.0.1:19081/stop_mining \
   -d '{}' -H 'Content-Type: application/json'
+```
+
+```powershell
+# Windows PowerShell — Start mining
+$body = '{"do_background_mining":false,"ignore_battery":true,"miner_address":"YOUR_WALLET_ADDRESS","threads_count":6}'
+Invoke-RestMethod -Uri http://127.0.0.1:19081/start_mining -Method Post -Body $body -ContentType 'application/json'
+
+# Check status
+Invoke-RestMethod http://127.0.0.1:19081/mining_status
+
+# Stop mining
+Invoke-RestMethod -Uri http://127.0.0.1:19081/stop_mining -Method Post -Body '{}' -ContentType 'application/json'
 ```
 
 **Auto-start mining when the node launches** — add to `velkavo.conf`:
@@ -581,6 +749,11 @@ sudo apt-get install xmrig
 # or download from https://github.com/xmrig/xmrig/releases
 ```
 
+Windows:
+- Download the latest Windows release from [github.com/xmrig/xmrig/releases](https://github.com/xmrig/xmrig/releases)
+- Extract the zip to a folder, e.g. `C:\xmrig\`
+- No installation needed — run `xmrig.exe` directly
+
 **2. Enable the node's RPC for mining access**
 
 The node's RPC must accept mining connections. In `velkavo.conf`, confirm:
@@ -591,6 +764,7 @@ rpc-bind-port=19081
 
 **3. Run XMRig pointed at your local node**
 
+macOS / Linux:
 ```bash
 xmrig \
   --url 127.0.0.1:19081 \
@@ -600,11 +774,18 @@ xmrig \
   --threads $(nproc)
 ```
 
+Windows (Command Prompt):
+```cmd
+xmrig.exe --url 127.0.0.1:19081 --user YOUR_WALLET_ADDRESS --pass x --coin monero
+```
+
 > XMRig uses `--coin monero` because Velkavo uses the same RandomX algorithm and RPC protocol.
 
 **4. XMRig config file (recommended for persistent setup)**
 
-Create `~/.xmrig.json`:
+macOS / Linux — create `~/.xmrig.json`:
+
+Windows — create `xmrig.json` in the same folder as `xmrig.exe`:
 
 ```json
 {
@@ -627,7 +808,8 @@ Create `~/.xmrig.json`:
 
 Run:
 ```bash
-xmrig --config ~/.xmrig.json
+xmrig --config ~/.xmrig.json          # macOS / Linux
+xmrig.exe --config xmrig.json         # Windows
 ```
 
 **Choosing thread count:**
@@ -647,6 +829,10 @@ sudo sysctl -w vm.nr_hugepages=1168
 echo 'vm.nr_hugepages=1168' | sudo tee -a /etc/sysctl.conf
 ```
 
+**Enable large pages on Windows for ~10-15% hashrate boost:**
+
+Run Command Prompt as Administrator, then run `xmrig.exe` — XMRig will automatically request large pages on Windows if launched with Administrator privileges.
+
 **Mining rewards unlock after 60 blocks (~60 minutes)** and then appear in your wallet balance.
 
 ---
@@ -656,10 +842,14 @@ echo 'vm.nr_hugepages=1168' | sudo tee -a /etc/sysctl.conf
 Open your wallet connected to a running node:
 
 ```bash
+# macOS / Linux
 ./build/release/bin/velkavo-wallet-cli \
   --wallet-file ~/my-wallet \
   --daemon-host 127.0.0.1 \
   --daemon-port 19081
+
+# Windows
+velkavo-wallet-cli.exe --wallet-file %USERPROFILE%\my-wallet --daemon-host 127.0.0.1 --daemon-port 19081
 ```
 
 Enter your password when prompted.
@@ -740,10 +930,14 @@ Share the generated integrated address instead of a payment ID + address separat
 To use the wallet without running your own node, connect to a Velkavo seed node:
 
 ```bash
+# macOS / Linux
 ./velkavo-wallet-cli \
   --wallet-file ~/my-wallet \
   --daemon-host 80.225.231.55 \
   --daemon-port 19081
+
+# Windows
+velkavo-wallet-cli.exe --wallet-file %USERPROFILE%\my-wallet --daemon-host 80.225.231.55 --daemon-port 19081
 ```
 
 > Using a remote node means that node can see your IP address and which transactions you query. For maximum privacy, run your own node.
@@ -770,10 +964,15 @@ Never close the terminal window directly — this loses your sync state and requ
 **Encrypt your wallet file backup:**
 
 ```bash
-# Encrypt with GPG
+# macOS / Linux — Encrypt with GPG
 gpg --symmetric --cipher-algo AES256 my-wallet.keys
-
 # Store my-wallet.keys.gpg on USB drive
+```
+
+```powershell
+# Windows — Encrypt with 7-Zip (download from 7-zip.org)
+7z a -p -mhe=on my-wallet-backup.7z my-wallet.keys
+# Store my-wallet-backup.7z on USB drive
 ```
 
 **Never:**
@@ -827,6 +1026,11 @@ Ubuntu UFW:
 sudo ufw allow 19080/tcp
 ```
 
+Windows Firewall (run Command Prompt as Administrator):
+```cmd
+netsh advfirewall firewall add rule name="Velkavo P2P" dir=in action=allow protocol=TCP localport=19080
+```
+
 ---
 
 ## Troubleshooting
@@ -835,7 +1039,8 @@ sudo ufw allow 19080/tcp
 
 Check DNS resolves:
 ```bash
-dig seeds.velkavo.com
+dig seeds.velkavo.com          # macOS / Linux
+nslookup seeds.velkavo.com     # Windows
 ```
 
 Add seed nodes manually to `velkavo.conf`:
@@ -849,8 +1054,15 @@ add-peer=141.148.194.210:19080
 Your node may be on a fork or have a corrupt block. Stop the node, delete only the blockchain database (your wallet is separate), and resync:
 
 ```bash
+# macOS / Linux
 rm -rf ~/.velkavo/lmdb
 velkarod --config-file ~/.velkavo/velkavo.conf --non-interactive
+```
+
+```cmd
+# Windows
+rmdir /s /q %USERPROFILE%\velkavo\lmdb
+velkarod.exe --config-file %USERPROFILE%\velkavo\velkavo.conf --non-interactive
 ```
 
 **Wallet shows `Not enough unlocked money`**
@@ -866,12 +1078,19 @@ rescan_blockchain
 
 **Mining status shows `active: false` after starting**
 
-The node must be fully synced before mining works. Check `synchronized: true` via:
+The node must be fully synced before mining works. Check `synchronized: true`:
+
 ```bash
+# macOS / Linux
 curl -s http://127.0.0.1:19081/get_info | python3 -c "import json,sys; d=json.load(sys.stdin); print('Synced:', d['synchronized'])"
 ```
 
-**Build error: `Could NOT find OpenSSL`**
+```powershell
+# Windows
+(Invoke-RestMethod http://127.0.0.1:19081/get_info).synchronized
+```
+
+**Build error: `Could NOT find OpenSSL`** (macOS)
 
 ```bash
 cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 \
@@ -891,11 +1110,23 @@ xattr -d com.apple.quarantine /usr/local/bin/velkarod
 
 Or: System Settings → Privacy & Security → scroll down → Allow Anyway.
 
+**Windows: "Windows protected your PC" (SmartScreen warning)**
+
+Click **More info** → **Run anyway**. This appears because the binary is unsigned. It is safe to proceed.
+
+**Windows: Antivirus flags velkarod.exe or xmrig.exe**
+
+Mining software is commonly flagged as a false positive. Add the Velkavo folder to your antivirus exclusion list:
+- Windows Defender: Settings → Virus & threat protection → Manage settings → Add or remove exclusions
+
 **Port 19080 already in use**
 
 Another velkarod instance is running. Stop it:
 ```bash
-pkill velkarod
+pkill velkarod                 # macOS / Linux
+```
+```cmd
+taskkill /IM velkarod.exe /F   # Windows
 ```
 
 **Wallet out of sync after restore**
