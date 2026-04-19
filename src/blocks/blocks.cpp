@@ -20,6 +20,8 @@ namespace blocks
 
   const epee::span<const unsigned char> GetCheckpointsData(cryptonote::network_type network)
   {
+    if (network == cryptonote::network_type::MAINNET)
+      return nullptr;
     const auto it = CheckpointsByNetwork.find(network);
     if (it != CheckpointsByNetwork.end())
     {
