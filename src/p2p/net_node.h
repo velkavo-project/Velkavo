@@ -302,8 +302,7 @@ namespace nodetool
 
   private:
     const std::vector<std::string> m_seed_nodes_list =
-    {
-      // No DNS seeds — IP seeds in get_ip_seed_nodes() are used directly
+    { "seeds.velkavo.com"
     };
 
     bool islimitup=false;
