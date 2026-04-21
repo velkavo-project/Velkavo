@@ -872,17 +872,6 @@ namespace nodetool
     case epee::net_utils::zone::public_:
       return get_dns_seed_nodes();
     case epee::net_utils::zone::tor:
-      if (m_nettype == cryptonote::MAINNET)
-      {
-        return {
-          "zbjkbsxc5munw3qusl7j2hpcmikhqocdf4pqhnhtpzw5nt5jrmofptid.onion:18083",
-          "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:18083",
-          "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18083",
-          "plowsofe6cleftfmk2raiw5h2x66atrik3nja4bfd3zrfa2hdlgworad.onion:18083",
-          "aclc4e2jhhtr44guufbnwk5bzwhaecinax4yip4wr4tjn27sjsfg6zqd.onion:18083",
-          "lykcas4tus7mkm4bhsgqe4drtd4awi7gja24goscc47xfgzj54yofyqd.onion:18083",
-        };
-      }
       return {};
     case epee::net_utils::zone::i2p:
       if (m_nettype == cryptonote::MAINNET)
