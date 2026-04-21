@@ -32,50 +32,27 @@
 #define VELKAVO_DEFAULT_LOG_CATEGORY "blockchain.hardforks"
 
 const hardfork_t mainnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
-
-  // version 2 starts from block 1009827, which is on or around the 20th of March, 2016. Fork time finalised on 2015-09-20. No fork voting occurs for the v2 fork.
-  { 2, 1009827, 0, 1442763710 },
-
-  // version 3 starts from block 1141317, which is on or around the 24th of September, 2016. Fork time finalised on 2016-03-21.
-  { 3, 1141317, 0, 1458558528 },
-
-  // version 4 starts from block 1220516, which is on or around the 5th of January, 2017. Fork time finalised on 2016-09-18.
-  { 4, 1220516, 0, 1483574400 },
-
-  // version 5 starts from block 1288616, which is on or around the 15th of April, 2017. Fork time finalised on 2017-03-14.
-  { 5, 1288616, 0, 1489520158 }, 
-
-  // version 6 starts from block 1400000, which is on or around the 16th of September, 2017. Fork time finalised on 2017-08-18.
-  { 6, 1400000, 0, 1503046577 },
-
-  // version 7 starts from block 1546000, which is on or around the 6th of April, 2018. Fork time finalised on 2018-03-17.
-  { 7, 1546000, 0, 1521303150 },
-
-  // version 8 starts from block 1685555, which is on or around the 18th of October, 2018. Fork time finalised on 2018-09-02.
-  { 8, 1685555, 0, 1535889547 },
-
-  // version 9 starts from block 1686275, which is on or around the 19th of October, 2018. Fork time finalised on 2018-09-02.
-  { 9, 1686275, 0, 1535889548 },
-
-  // version 10 starts from block 1788000, which is on or around the 9th of March, 2019. Fork time finalised on 2019-02-10.
-  { 10, 1788000, 0, 1549792439 },
-
-  // version 11 starts from block 1788720, which is on or around the 10th of March, 2019. Fork time finalised on 2019-02-15.
-  { 11, 1788720, 0, 1550225678 },
-
-  // version 12 starts from block 1978433, which is on or around the 30th of November, 2019. Fork time finalised on 2019-10-18.
-  { 12, 1978433, 0, 1571419280 },
-
-  { 13, 2210000, 0, 1598180817 },
-  { 14, 2210720, 0, 1598180818 },
-
-  { 15, 2688888, 0, 1656629117 },
-  { 16, 2689608, 0, 1656629118 },
+  // Velkavo is a new chain — all hardfork versions activate at blocks 1–16 so the
+  // chain launches with HF16 (CLSAG, Bulletproof+, view tags) from the start.
+  { 1,  1,  0, 1341378000 },
+  { 2,  2,  0, 1341378001 },
+  { 3,  3,  0, 1341378002 },
+  { 4,  4,  0, 1341378003 },
+  { 5,  5,  0, 1341378004 },
+  { 6,  6,  0, 1341378005 },
+  { 7,  7,  0, 1341378006 },
+  { 8,  8,  0, 1341378007 },
+  { 9,  9,  0, 1341378008 },
+  { 10, 10, 0, 1341378009 },
+  { 11, 11, 0, 1341378010 },
+  { 12, 12, 0, 1341378011 },
+  { 13, 13, 0, 1341378012 },
+  { 14, 14, 0, 1341378013 },
+  { 15, 15, 0, 1341378014 },
+  { 16, 16, 0, 1341378015 },
 };
 const size_t num_mainnet_hard_forks = sizeof(mainnet_hard_forks) / sizeof(mainnet_hard_forks[0]);
-const uint64_t mainnet_hard_fork_version_1_till = 1009826;
+const uint64_t mainnet_hard_fork_version_1_till = 1;
 
 const hardfork_t testnet_hard_forks[] = {
   // version 1 from the start of the blockchain
