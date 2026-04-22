@@ -1051,6 +1051,16 @@ add-peer=80.225.231.55:19080
 add-peer=141.148.194.210:19080
 ```
 
+Or restart the node with `--add-peer` flags directly (Windows):
+```cmd
+velkarod.exe --config-file %USERPROFILE%\velkavo\velkavo.conf --non-interactive --add-peer 80.225.231.55:19080 --add-peer 141.148.194.210:19080
+```
+
+macOS / Linux:
+```bash
+velkarod --config-file ~/.velkavo/velkavo.conf --non-interactive --add-peer 80.225.231.55:19080 --add-peer 141.148.194.210:19080
+```
+
 **Node stuck at the same block height**
 
 Your node may be on a fork or have a corrupt block. Stop the node, delete only the blockchain database (your wallet is separate), and resync:
