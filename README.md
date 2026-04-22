@@ -532,7 +532,7 @@ Key fields:
 |-------|---------|
 | `synchronized: true` | Fully caught up — safe to mine and transact |
 | `height` | Your node's current block height |
-| `target_height` | Network tip (0 once synced) |
+| `target_height` | Network tip — `0` means you are at the tip of the chain (fully synced) |
 | `outgoing_connections_count` | Peers you are connected to (should be > 0) |
 | `incoming_connections_count` | Peers connected to you (requires open port 19080) |
 
