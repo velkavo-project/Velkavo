@@ -927,18 +927,19 @@ Share the generated integrated address instead of a payment ID + address separat
 
 **Remote node (no local node needed):**
 
-To use the wallet without running your own node, connect to a Velkavo seed node:
+To use the wallet without running your own node, connect to a Velkavo public seed node via the restricted RPC port (19083):
 
 ```bash
 # macOS / Linux
 ./velkavo-wallet-cli \
   --wallet-file ~/my-wallet \
-  --daemon-host 80.225.231.55 \
-  --daemon-port 19081
+  --daemon-address 80.225.231.55:19083
 
 # Windows
-velkavo-wallet-cli.exe --wallet-file %USERPROFILE%\my-wallet --daemon-host 80.225.231.55 --daemon-port 19081
+velkavo-wallet-cli.exe --wallet-file %USERPROFILE%\my-wallet --daemon-address 80.225.231.55:19083
 ```
+
+Port 19083 is the public restricted RPC — it allows wallet connections but blocks all admin/dangerous endpoints. Port 19081 is localhost-only and must never be exposed to the internet.
 
 > Using a remote node means that node can see your IP address and which transactions you query. For maximum privacy, run your own node.
 
@@ -1009,16 +1010,17 @@ You will be asked for your address and view key (get the view key with `viewkey`
 
 **Ports:**
 
-| Network | P2P | RPC | ZMQ |
-|---------|-----|-----|-----|
-| Mainnet | 19080 | 19081 | 19082 |
-| Testnet | 29080 | 29081 | 29082 |
-| Stagenet | 39080 | 39081 | 39082 |
+| Network | P2P | RPC (local only) | Restricted RPC (public) | ZMQ |
+|---------|-----|------------------|-------------------------|-----|
+| Mainnet | 19080 | 19081 | 19083 | 19082 |
+| Testnet | 29080 | 29081 | 29083 | 29082 |
+| Stagenet | 39080 | 39081 | 39083 | 39082 |
 
 **Firewall rules:**
 
 - Open port **19080** (P2P) inbound — lets other nodes connect to you, improves the network
 - Keep port **19081** (RPC) on localhost only — never expose this to the internet
+- Port **19083** (Restricted RPC) — safe to expose publicly; wallets connect here on public nodes
 - Port **19082** (ZMQ) — only needed for ZMQ event subscriptions
 
 Ubuntu UFW:
@@ -1151,6 +1153,7 @@ This is slow but thorough. If you know the approximate block height when your wa
 | `refresh` | Sync wallet with the node |
 | `transfer <addr> <amount>` | Send VKV |
 | `sweep_all <addr>` | Send entire balance to an address |
+| `sweep_unmixable` | Sweep old non-RCT outputs that cannot form a ring (run once on wallets from early blocks) |
 | `show_transfers` | Show all transaction history |
 | `show_transfers in` | Show incoming transactions only |
 | `show_transfers out` | Show outgoing transactions only |
