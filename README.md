@@ -1140,6 +1140,14 @@ rescan_blockchain
 
 This is slow but thorough. If you know the approximate block height when your wallet was first used, you can stop and restore again with `--restore-height` to skip older blocks.
 
+**"refresh-from-block-height setting is higher than the daemon's height"**
+
+The wallet's restore height is set beyond the current chain tip — it will skip all transactions. Reset it to 0 and rescan:
+```
+set refresh-from-block-height 0
+rescan_bc
+```
+
 ---
 
 ## Common Wallet Commands Reference
