@@ -44,43 +44,25 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install cross-compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
-            cmake pkg-config
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
-      - name: Install ARM64 dependencies via apt
-        run: |
-          sudo dpkg --add-architecture arm64
-          sudo sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          sudo apt-get update
-          sudo apt-get install -y \
-            libboost-all-dev:arm64 libssl-dev:arm64 libzmq3-dev:arm64 \
-            libunbound-dev:arm64 libsodium-dev:arm64 libhidapi-dev:arm64 \
-            liblzma-dev:arm64 libreadline-dev:arm64
-
-      - name: Configure
-        run: |
-          mkdir -p build/arm64 && cd build/arm64
-          cmake -DCMAKE_BUILD_TYPE=Release \
-                -DMANUAL_SUBMODULES=1 \
-                -DCMAKE_SYSTEM_NAME=Linux \
-                -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
-                -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-                -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
-                ../..
-
-      - name: Build
-        run: make -C build/arm64 daemon -j$(nproc)
+      - name: Build inside ARM64 container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          platforms: linux/arm64
+          file: .github/Dockerfile.arm64
+          outputs: type=local,dest=./arm64-out
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: velkarod-linux-arm64
-          path: build/arm64/bin/velkarod
+          path: arm64-out/velkarod
 
   release:
     name: Attach binaries to release

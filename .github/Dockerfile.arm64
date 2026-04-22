@@ -1,0 +1,16 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    build-essential cmake pkg-config \
+    libboost-all-dev libssl-dev libzmq3-dev libunbound-dev \
+    libsodium-dev libhidapi-dev liblzma-dev libreadline-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY . .
+
+RUN mkdir -p build/release && cd build/release && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DMANUAL_SUBMODULES=1 ../.. && \
+    make daemon -j$(nproc)
+
+RUN mkdir /out && cp build/release/bin/velkarod /out/velkarod
